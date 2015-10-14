@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1C8976BB1BCB42AD0026CA62 /* RangeEditView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C8976BA1BCB42AD0026CA62 /* RangeEditView.m */; settings = {ASSET_TAGS = (); }; };
+		1CA36E7C1BCDF5B9009503E6 /* XcodeMultiEditContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CA36E7B1BCDF5B9009503E6 /* XcodeMultiEditContext.m */; settings = {ASSET_TAGS = (); }; };
+		1CA36E821BCDFE28009503E6 /* XcodeMultiEditView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CA36E811BCDFE28009503E6 /* XcodeMultiEditView.m */; settings = {ASSET_TAGS = (); }; };
 		226268A11AA55B2500ABBBB2 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226268A01AA55B2500ABBBB2 /* AppKit.framework */; };
 		226268A31AA55B2500ABBBB2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226268A21AA55B2500ABBBB2 /* Foundation.framework */; };
 		226268A81AA55B2500ABBBB2 /* XcodeMultiEdit.xcodeproj in Resources */ = {isa = PBXBuildFile; fileRef = 226268A71AA55B2500ABBBB2 /* XcodeMultiEdit.xcodeproj */; };
@@ -15,9 +16,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1C8976B91BCB42AD0026CA62 /* RangeEditView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RangeEditView.h; sourceTree = "<group>"; };
-		1C8976BA1BCB42AD0026CA62 /* RangeEditView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RangeEditView.m; sourceTree = "<group>"; };
 		1C8976BC1BCC29590026CA62 /* XCFXcodePrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XCFXcodePrivate.h; sourceTree = "<group>"; };
+		1CA36E7A1BCDF5B9009503E6 /* XcodeMultiEditContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XcodeMultiEditContext.h; sourceTree = "<group>"; };
+		1CA36E7B1BCDF5B9009503E6 /* XcodeMultiEditContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XcodeMultiEditContext.m; sourceTree = "<group>"; };
+		1CA36E801BCDFE28009503E6 /* XcodeMultiEditView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XcodeMultiEditView.h; sourceTree = "<group>"; };
+		1CA36E811BCDFE28009503E6 /* XcodeMultiEditView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XcodeMultiEditView.m; sourceTree = "<group>"; };
 		2262689D1AA55B2500ABBBB2 /* XcodeMultiEdit.xcplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XcodeMultiEdit.xcplugin; sourceTree = BUILT_PRODUCTS_DIR; };
 		226268A01AA55B2500ABBBB2 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		226268A21AA55B2500ABBBB2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
@@ -77,8 +80,10 @@
 				1C8976BC1BCC29590026CA62 /* XCFXcodePrivate.h */,
 				226268A91AA55B2500ABBBB2 /* XcodeMultiEdit.h */,
 				226268AA1AA55B2500ABBBB2 /* XcodeMultiEdit.m */,
-				1C8976B91BCB42AD0026CA62 /* RangeEditView.h */,
-				1C8976BA1BCB42AD0026CA62 /* RangeEditView.m */,
+				1CA36E7A1BCDF5B9009503E6 /* XcodeMultiEditContext.h */,
+				1CA36E7B1BCDF5B9009503E6 /* XcodeMultiEditContext.m */,
+				1CA36E801BCDFE28009503E6 /* XcodeMultiEditView.h */,
+				1CA36E811BCDFE28009503E6 /* XcodeMultiEditView.m */,
 				226268A51AA55B2500ABBBB2 /* Supporting Files */,
 			);
 			name = xcodeplugin;
@@ -167,7 +172,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1C8976BB1BCB42AD0026CA62 /* RangeEditView.m in Sources */,
+				1CA36E821BCDFE28009503E6 /* XcodeMultiEditView.m in Sources */,
+				1CA36E7C1BCDF5B9009503E6 /* XcodeMultiEditContext.m in Sources */,
 				226268AB1AA55B2500ABBBB2 /* XcodeMultiEdit.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
