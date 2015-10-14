@@ -8,8 +8,10 @@
 
 #import <AppKit/AppKit.h>
 
-#import "XCFXcodePrivate.h"
+#import "XCPrivateMethods.h"
 
 @interface xcodeplugin : NSObject <NSWindowDelegate, NSTextFieldDelegate>
+
+-(void)finishedEditing;
 
 @end

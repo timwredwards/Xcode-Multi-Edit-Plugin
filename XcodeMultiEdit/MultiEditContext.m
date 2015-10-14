@@ -1,16 +1,16 @@
 //
-//  XcodeMultiEditContext.m
+//  MultiEditContext.m
 //  XcodeMultiEdit
 //
 //  Created by Timothy Edwards on 14/10/2015.
 //  Copyright © 2015 Tim. All rights reserved.
 //
 
-#import "XcodeMultiEditContext.h"
+#import "MultiEditContext.h"
 
-#import "XcodeMultiEditView.h"
+#import "MultiEditView.h"
 
-@interface XcodeMultiEditContext (){
+@interface MultiEditContext (){
     NSTextView *mainTextView;
     IDESourceCodeDocument *mainDocument;
     DVTSourceTextStorage *mainTextStorage;
@@ -25,7 +25,7 @@
 
 @end
 
-@implementation XcodeMultiEditContext
+@implementation MultiEditContext
 
 -(instancetype)initWithEditor:(IDESourceCodeEditor *)editor{
     self = [super init];
@@ -98,7 +98,7 @@
 
 -(void)createEditViewForStringRange:(NSRange)range{
     NSRect rangeRect = [[mainTextView layoutManager] boundingRectForGlyphRange:range inTextContainer:mainTextView.textContainer];
-    XcodeMultiEditView *editView = [[XcodeMultiEditView alloc] initWithFrame:rangeRect];
+    MultiEditView *editView = [[MultiEditView alloc] initWithFrame:rangeRect];
     [editView setPresentedRange:range];
     [mainTextView addSubview:editView];
     if ((range.location+range.length)<selectedRange.location) {
@@ -139,6 +139,7 @@
     
     [textField setTarget:self];
     [textField setAction:@selector(enterKeyPressed)];
+
 }
 
 -(void)controlTextDidChange:(NSNotification *)obj{
@@ -188,19 +189,14 @@
 -(void)enterKeyPressed{
     [editViewsBeforeSelected enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [obj removeFromSuperview];
-        obj = nil;
     }];
     [editViewsAfterSelected enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [obj removeFromSuperview];
-        obj = nil;
     }];
-    [editViewsBeforeSelected removeAllObjects];
-    [editViewsAfterSelected removeAllObjects];
     [textField removeFromSuperview];
-    textField = nil;
     [containerView removeFromSuperview];
-    containerView = nil;
     [[NSApp mainWindow] makeFirstResponder:mainTextView];
+    [_mainPlugin finishedEditing];
 }
 
 @end

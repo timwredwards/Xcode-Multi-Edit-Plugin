@@ -6,9 +6,9 @@
 //  Copyright © 2015 Tim. All rights reserved.
 //
 
-#import "XcodeMultiEditView.h"
+#import "MultiEditView.h"
 
-@implementation XcodeMultiEditView
+@implementation MultiEditView
 
 -(instancetype)initWithFrame:(NSRect)frameRect{
     self = [super initWithFrame:frameRect];

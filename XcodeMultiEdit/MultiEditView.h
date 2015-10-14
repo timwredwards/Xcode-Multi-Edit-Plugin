@@ -8,7 +8,7 @@
 
 #import <AppKit/AppKit.h>
 
-@interface XcodeMultiEditView : NSView
+@interface MultiEditView : NSView
 
 @property NSRange presentedRange;
 

@@ -1,5 +1,5 @@
 //
-//  XcodeMultiEditContext.h
+//  MultiEditContext.h
 //  XcodeMultiEdit
 //
 //  Created by Timothy Edwards on 14/10/2015.
@@ -8,9 +8,13 @@
 
 #import <AppKit/AppKit.h>
 
-#import "XCFXcodePrivate.h"
+#import "MultiEdit.h"
 
-@interface XcodeMultiEditContext : NSObject <NSTextFieldDelegate>
+@interface MultiEditContext : NSObject <NSTextFieldDelegate>
+
+@property (nonatomic, readonly) BOOL isEditing;
+
+@property (weak, nonatomic) xcodeplugin *mainPlugin;
 
 -(instancetype)initWithEditor:(IDESourceCodeEditor*)editor;
 

@@ -6,14 +6,14 @@
 //  Copyright (c) 2015 Tim. All rights reserved.
 //
 
-#import "XcodeMultiEdit.h"
+#import "MultiEdit.h"
 
-#import "XcodeMultiEditContext.h"
+#import "MultiEditContext.h"
 
 static xcodeplugin *sharedPlugin;
 
 @interface xcodeplugin(){
-    XcodeMultiEditContext *context;
+    MultiEditContext *context;
 }
 
 @property (nonatomic, strong, readwrite) NSBundle *bundle;
@@ -22,10 +22,10 @@ static xcodeplugin *sharedPlugin;
 
 @implementation xcodeplugin
 
-// future
-// attributed
-// settings panel
+// future todo:
 // alcatraz
+// settings panel
+// readme
 
 + (void)pluginDidLoad:(NSBundle *)pluginBundle {
     
@@ -83,10 +83,15 @@ static xcodeplugin *sharedPlugin;
             return;
         }
 
-        context = [[XcodeMultiEditContext alloc] initWithEditor:editor];
+        context = [[MultiEditContext alloc] initWithEditor:editor];
+        [context setMainPlugin:self];
     } else {
         [context addNextRangeForStringRepeatingPage];
     }
+}
+
+-(void)finishedEditing{
+    context = nil;
 }
 
 @end
