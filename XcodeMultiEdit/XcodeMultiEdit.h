@@ -8,8 +8,6 @@
 
 #import <AppKit/AppKit.h>
 
-#import "XCFXcodePrivate.h"
-
-@interface xcodeplugin : NSObject <NSWindowDelegate, NSTextFieldDelegate>
+@interface xcodeplugin : NSObject <NSWindowDelegate>
 
 @end

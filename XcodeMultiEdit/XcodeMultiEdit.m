@@ -8,7 +8,9 @@
 
 #import "XcodeMultiEdit.h"
 
-#import "RangeEditView.h"
+#import "XCFXcodePrivate.h"
+
+#import "MultiEditLocation.h"
 
 static xcodeplugin *sharedPlugin;
 
@@ -17,12 +19,13 @@ static xcodeplugin *sharedPlugin;
     IDESourceCodeDocument *mainDocument;
     DVTSourceTextStorage *mainTextStorage;
     
-    NSMutableArray *editViewsBeforeSelected;
-    NSMutableArray *editViewsAfterSelected;
+    NSMutableArray *editLocations;
     NSString *selectedString;
     NSRange selectedRange;
-    NSView *containerView;
-    NSTextField *textField;
+    
+    NSUInteger oldLength;
+    
+    NSUInteger oldTextStorageLength;
 }
 
 @property (nonatomic, strong, readwrite) NSBundle *bundle;
@@ -31,10 +34,13 @@ static xcodeplugin *sharedPlugin;
 
 @implementation xcodeplugin
 
-// future
-// make faster
+//  tomorrow:
 // settings panel
 // alcatraz
+// readme
+
+// future:
+// make faster
 
 + (void)pluginDidLoad:(NSBundle *)pluginBundle {
     
@@ -77,10 +83,9 @@ static xcodeplugin *sharedPlugin;
         [[menuItem submenu] addItem:actionMenuItem];
     }
     
-    editViewsBeforeSelected = [[NSMutableArray alloc] init];
-    editViewsAfterSelected = [[NSMutableArray alloc] init];
+    editLocations = [[NSMutableArray alloc] init];
     
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidFinishLaunchingNotification object:nil];
 }
 
 -(void)doAction{
@@ -97,31 +102,38 @@ static xcodeplugin *sharedPlugin;
     mainDocument = [editor sourceCodeDocument];
     mainTextStorage = [editor sourceCodeDocument].textStorage;
     
-    if ((editViewsBeforeSelected.count == 0) && (editViewsAfterSelected.count == 0)) {
-        
+    if (editLocations.count == 0) {
         selectedString = [mainTextView.string substringWithRange:mainTextView.selectedRange];
         selectedRange = mainTextView.selectedRange;
-        [self createTextFieldViewForStringRange:selectedRange];
+        [self createEditViewForStringRange:selectedRange];
     }
     [self addNextRangeForStringRepeatingPage];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(textDidChange:)
+                                                 name:NSTextDidChangeNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(textStorageWillProcessEditing:)
+                                                 name:NSTextStorageWillProcessEditingNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(textViewDidChangeSelection:)
+                                                 name:NSTextViewDidChangeSelectionNotification
+                                               object:nil];
+    
+    oldLength = mainTextStorage.length;
 }
 
 -(void)addNextRangeForStringRepeatingPage{
     
-    NSRange lastRange;
+    NSUInteger lastLocation = [editLocations.lastObject editLocation];
     
-    BOOL loopedAround = NO;
+    BOOL loopedAround = (lastLocation < selectedRange.location);
     
-    if (editViewsBeforeSelected.count>0) {
-        lastRange = [[editViewsBeforeSelected lastObject] presentedRange];
-        loopedAround = YES;
-    } else if (editViewsAfterSelected.count>0){
-        lastRange = [[editViewsAfterSelected lastObject] presentedRange];
-    } else {
-        lastRange = selectedRange;
-    }
-    
-    NSUInteger locationOfSearchRange = lastRange.location+lastRange.length;
+    NSUInteger locationOfSearchRange = lastLocation+selectedRange.length;
     NSUInteger lengthOfSearchRange;
     
     if (loopedAround) { // if we're looped around to the beginning of the document
@@ -141,7 +153,7 @@ static xcodeplugin *sharedPlugin;
         foundResult = YES;
         [self createEditViewForStringRange:newRange];
     } else {
-        if (!loopedAround) { // so we only loop around once
+        if (!loopedAround) { // so we only loop around once... this is the first and only time
             NSRange rangeLoopedAround = NSMakeRange(0, selectedRange.location);
             NSRange newRange = [mainTextView.string rangeOfString:selectedString options:0 range:rangeLoopedAround];
             if (newRange.location != NSNotFound) {
@@ -157,110 +169,163 @@ static xcodeplugin *sharedPlugin;
 
 
 -(void)createEditViewForStringRange:(NSRange)range{
-    NSRect rangeRect = [[mainTextView layoutManager] boundingRectForGlyphRange:range inTextContainer:mainTextView.textContainer];
-    RangeEditView *editView = [[RangeEditView alloc] initWithFrame:rangeRect];
-    [editView setPresentedRange:range];
-    [mainTextView addSubview:editView];
-    if ((range.location+range.length)<selectedRange.location) {
-        [editViewsBeforeSelected addObject:editView];
-    } else {
-        [editViewsAfterSelected addObject:editView];
-    }
+    [mainTextStorage addAttribute:NSBackgroundColorAttributeName value:[NSColor colorWithCalibratedRed:0 green:0 blue:255 alpha:0.5] range:range];
+    MultiEditLocation *multiEditLocation = [[MultiEditLocation alloc] init];
+    [multiEditLocation setEditLocation:(int)range.location];
+    [editLocations addObject:multiEditLocation];
     [mainTextView scrollRangeToVisible:range];
+    
+    //    NSRect rangeRect = [[mainTextView layoutManager] boundingRectForGlyphRange:range inTextContainer:mainTextView.textContainer];
+    //    RangeEditView *editView = [[RangeEditView alloc] initWithFrame:rangeRect];
+    //    [editView setLocationOffset:(int)range.location-(int)selectedRange.location];
+    //    [mainTextView addSubview:editView];
+    //    [editViews addObject:editView];
+    //    [mainTextView scrollRangeToVisible:range];
 }
 
--(void)createTextFieldViewForStringRange:(NSRange)range{
+-(void)textDidChange:(NSNotification*)notification{
     
-    NSRect rangeRect = [[mainTextView layoutManager] boundingRectForGlyphRange:range inTextContainer:mainTextView.textContainer];
     
-    containerView = [[NSView alloc] initWithFrame:rangeRect];
-    [containerView setWantsLayer:YES];
-    [containerView.layer setBackgroundColor:CGColorCreateGenericGray(1.0, 1.0)];
-    [containerView.layer setBorderColor:CGColorCreateGenericGray(0.0, 1.0)];
-    [containerView.layer setBorderWidth:1.0];
-    [containerView.layer setCornerRadius:2.0];
-    [mainTextView addSubview:containerView];
     
-    textField = [[NSTextField alloc] init];
-    [textField setStringValue:selectedString];
-    [textField setFont:mainTextView.font];
-    [textField setBezeled:NO];
-    [textField setDrawsBackground:NO];
-    [textField setUsesSingleLineMode:YES];
+    NSUInteger changeInLength = mainTextStorage.length-oldLength;
     
-    [textField sizeToFit];
-    CGRect textFrame = CGRectMake(-2, 0, textField.frame.size.width, textField.frame.size.height);
-    
-    [textField setFrame:NSRectFromCGRect(textFrame)];
-    
-    [containerView addSubview:textField];
-    [textField setDelegate:self];
-    [[NSApp mainWindow] makeFirstResponder:textField];
-    
-    [textField setTarget:self];
-    [textField setAction:@selector(enterKeyPressed)];
-}
-
--(void)controlTextDidChange:(NSNotification *)obj{
-    [textField setStringValue:textField.stringValue];
-    if (![textField.stringValue hasSuffix:@" "]) {
-        [textField sizeToFit];
+    if (changeInLength != 0) {
+        
+        
+        selectedRange = NSMakeRange(selectedRange.location, selectedRange.length+changeInLength);
+        selectedString = [mainTextStorage.string substringWithRange:selectedRange];
+        
+        NSUInteger lowerLimit = selectedRange.location;
+        NSUInteger upperLimit = selectedRange.location+selectedRange.length;
+        
+        // in correct range
+        if ((mainTextView.selectedRange.location >= lowerLimit) && (mainTextView.selectedRange.location <= upperLimit)) {
+            
+            
+            [mainTextStorage addAttribute:NSBackgroundColorAttributeName value:[NSColor clearColor] range:NSMakeRange(0, mainTextStorage.string.length)];
+            
+            [editLocations enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                
+                NSInteger offset = changeInLength * idx;
+                NSUInteger location = [obj editLocation]+offset;
+                NSUInteger length = selectedRange.length-offset;
+                NSRange rangeToEdit = NSMakeRange(location, length);
+                [mainTextStorage addAttribute:NSBackgroundColorAttributeName value:[NSColor colorWithCalibratedRed:0 green:0 blue:255 alpha:0.5] range:rangeToEdit];
+                [obj setEditLocation:(int)rangeToEdit.location];
+                
+                if (idx>0) {
+//                    [mainTextStorage replaceCharactersInRange:NSMakeRange([obj editLocation], selectedRange.length-changeInLength) withString:selectedString withUndoManager:mainDocument.undoManager];
+                }
+            }];
+        }
+        oldLength = mainTextStorage.length;
     }
-    [containerView setFrame:NSRectFromCGRect(CGRectMake(containerView.frame.origin.x,
-                                                        containerView.frame.origin.y,
-                                                        textField.frame.size.width,
-                                                        containerView.frame.size.height))];
-    
-    
-    
-    
-    
-    [editViewsBeforeSelected enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        int locationOffset = (int)textField.stringValue.length - (int)selectedString.length;
-        locationOffset = locationOffset * (int)idx;
-        NSRange rangeToEdit = NSMakeRange([obj presentedRange].location+locationOffset, [obj presentedRange].length);
-        [mainTextStorage replaceCharactersInRange:rangeToEdit withString:textField.stringValue withUndoManager:mainDocument.undoManager];
-        [obj setPresentedRange:NSMakeRange([obj presentedRange].location, textField.stringValue.length)];
-        NSRect rangeRect = [[mainTextView layoutManager] boundingRectForGlyphRange:rangeToEdit inTextContainer:mainTextView.textContainer];
-        [obj setFrame:NSRectFromCGRect(CGRectMake(rangeRect.origin.x, rangeRect.origin.y, containerView.frame.size.width, containerView.frame.size.height))];
-    }];
-    
-    // calculate new range for edit box
-    int locationOffset = (int)textField.stringValue.length - (int)selectedString.length;
-    locationOffset = locationOffset * (int)editViewsBeforeSelected.count;
-    NSRange rangeToEdit = NSMakeRange(selectedRange.location+locationOffset, selectedRange.length);
-    [mainTextStorage replaceCharactersInRange:rangeToEdit withString:textField.stringValue withUndoManager:mainDocument.undoManager];
-    selectedRange = NSMakeRange(selectedRange.location, textField.stringValue.length);
-    
-    [editViewsAfterSelected enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        
-        int locationOffset = (int)textField.stringValue.length - (int)selectedString.length;
-        locationOffset = locationOffset * ((int)idx+(int)editViewsBeforeSelected.count+1);
-        NSRange rangeToEdit = NSMakeRange([obj presentedRange].location+locationOffset, [obj presentedRange].length);
-        [mainTextStorage replaceCharactersInRange:rangeToEdit withString:textField.stringValue withUndoManager:mainDocument.undoManager];
-        [obj setPresentedRange:NSMakeRange([obj presentedRange].location, textField.stringValue.length)];
-        
-        NSRect rangeRect = [[mainTextView layoutManager] boundingRectForGlyphRange:rangeToEdit inTextContainer:mainTextView.textContainer];
-        [obj setFrame:NSRectFromCGRect(CGRectMake(rangeRect.origin.x, rangeRect.origin.y, containerView.frame.size.width, containerView.frame.size.height))];
-    }];
 }
 
--(void)enterKeyPressed{
-    [editViewsBeforeSelected enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        [obj removeFromSuperview];
-        obj = nil;
-    }];
-    [editViewsAfterSelected enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        [obj removeFromSuperview];
-        obj = nil;
-    }];
-    [editViewsBeforeSelected removeAllObjects];
-    [editViewsAfterSelected removeAllObjects];
-    [textField removeFromSuperview];
-    textField = nil;
-    [containerView removeFromSuperview];
-    containerView = nil;
-    [[NSApp mainWindow] makeFirstResponder:mainTextView];
+-(void)textStorageWillProcessEditing:(NSNotification *)notification{
+    //
+}
+
+-(void)textViewDidChangeSelection:(NSNotification*)notification{
+    //    NSUInteger lowerLimit = selectedRange.location;
+    //    NSUInteger upperLimit = selectedRange.location+selectedRange.length;
+    //    if ((mainTextView.selectedRange.location >= lowerLimit) && (mainTextView.selectedRange.location <= upperLimit)) {
+    //        return;
+    //    } else {
+    //        [self cancel];
+    //    }
+    //    NSMutableAttributedString *atrStr = [mainTextView.attributedString mutableCopy];
+    //    [atrStr addAttribute:NSBackgroundColorAttributeName value:[NSColor colorWithCalibratedRed:255 green:0 blue:0 alpha:1.0] range:NSMakeRange(0, atrStr.length)];
+    //    [mainTextStorage setAttributedString:atrStr];
+    //    [mainTextStorage addAttribute:NSBackgroundColorAttributeName value:[NSColor colorWithCalibratedRed:255 green:0 blue:0 alpha:1.0] range:NSMakeRange(100, 100)];
+    //    [mainTextStorage addAttribute:NSBackgroundColorAttributeName value:[NSColor clearColor] range:NSMakeRange(0, mainTextStorage.string.length)];
+}
+
+-(void)cancel{
+    //    [editViews enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    //        [obj removeFromSuperview];
+    //        obj = nil;
+    //    }];
+    //    [editViews removeAllObjects];
+    //    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSTextDidChangeNotification object:nil];
+    //    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSTextViewDidChangeSelectionNotification object:nil];
 }
 
 @end
+
+
+//-(void)createTextFieldViewForStringRange:(NSRange)range{
+//
+//    NSRect rangeRect = [[mainTextView layoutManager] boundingRectForGlyphRange:range inTextContainer:mainTextView.textContainer];
+//
+//    containerView = [[NSView alloc] initWithFrame:rangeRect];
+//    [containerView setWantsLayer:YES];
+//    [containerView.layer setBackgroundColor:CGColorCreateGenericGray(1.0, 1.0)];
+//    [containerView.layer setBorderColor:CGColorCreateGenericGray(0.0, 1.0)];
+//    [containerView.layer setBorderWidth:1.0];
+//    [containerView.layer setCornerRadius:2.0];
+//    [mainTextView addSubview:containerView];
+//
+//    textField = [[NSTextField alloc] init];
+//    [textField setStringValue:selectedString];
+//    [textField setFont:mainTextView.font];
+//    [textField setBezeled:NO];
+//    [textField setDrawsBackground:NO];
+//    [textField setUsesSingleLineMode:YES];
+//
+//    [textField sizeToFit];
+//    CGRect textFrame = CGRectMake(-2, 0, textField.frame.size.width, textField.frame.size.height);
+//
+//    [textField setFrame:NSRectFromCGRect(textFrame)];
+//
+//    [containerView addSubview:textField];
+//    [textField setDelegate:self];
+//    [[NSApp mainWindow] makeFirstResponder:textField];
+//
+//    [textField setTarget:self];
+//    [textField setAction:@selector(enterKeyPressed)];
+//}
+
+//-(void)controlTextDidChange:(NSNotification *)obj{
+//    [textField setStringValue:textField.stringValue];
+//    if (![textField.stringValue hasSuffix:@" "]) {
+//        [textField sizeToFit];
+//    }
+//    [containerView setFrame:NSRectFromCGRect(CGRectMake(containerView.frame.origin.x,
+//                                                        containerView.frame.origin.y,
+//                                                        textField.frame.size.width,
+//                                                        containerView.frame.size.height))];
+//
+//
+//
+//
+//
+//    [editViewsBeforeSelected enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+//        int locationOffset = (int)textField.stringValue.length - (int)selectedString.length;
+//        locationOffset = locationOffset * (int)idx;
+//        NSRange rangeToEdit = NSMakeRange([obj presentedRange].location+locationOffset, [obj presentedRange].length);
+//        [mainTextStorage replaceCharactersInRange:rangeToEdit withString:textField.stringValue withUndoManager:mainDocument.undoManager];
+//        [obj setPresentedRange:NSMakeRange([obj presentedRange].location, textField.stringValue.length)];
+//        NSRect rangeRect = [[mainTextView layoutManager] boundingRectForGlyphRange:rangeToEdit inTextContainer:mainTextView.textContainer];
+//        [obj setFrame:NSRectFromCGRect(CGRectMake(rangeRect.origin.x, rangeRect.origin.y, containerView.frame.size.width, containerView.frame.size.height))];
+//    }];
+//
+//    // calculate new range for edit box
+//    int locationOffset = (int)textField.stringValue.length - (int)selectedString.length;
+//    locationOffset = locationOffset * (int)editViewsBeforeSelected.count;
+//    NSRange rangeToEdit = NSMakeRange(selectedRange.location+locationOffset, selectedRange.length);
+//    [mainTextStorage replaceCharactersInRange:rangeToEdit withString:textField.stringValue withUndoManager:mainDocument.undoManager];
+//    selectedRange = NSMakeRange(selectedRange.location, textField.stringValue.length);
+//
+//    [editViewsAfterSelected enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+//
+//        int locationOffset = (int)textField.stringValue.length - (int)selectedString.length;
+//        locationOffset = locationOffset * ((int)idx+(int)editViewsBeforeSelected.count+1);
+//        NSRange rangeToEdit = NSMakeRange([obj presentedRange].location+locationOffset, [obj presentedRange].length);
+//        [mainTextStorage replaceCharactersInRange:rangeToEdit withString:textField.stringValue withUndoManager:mainDocument.undoManager];
+//        [obj setPresentedRange:NSMakeRange([obj presentedRange].location, textField.stringValue.length)];
+//
+//        NSRect rangeRect = [[mainTextView layoutManager] boundingRectForGlyphRange:rangeToEdit inTextContainer:mainTextView.textContainer];
+//        [obj setFrame:NSRectFromCGRect(CGRectMake(rangeRect.origin.x, rangeRect.origin.y, containerView.frame.size.width, containerView.frame.size.height))];
+//    }];
+//}

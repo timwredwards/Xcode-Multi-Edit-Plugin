@@ -8,8 +8,8 @@
 
 #import <AppKit/AppKit.h>
 
-@interface RangeEditView : NSView
+@interface MultiEditLocation : NSView
 
-@property NSRange presentedRange;
+@property NSUInteger editLocation;
 
 @end
