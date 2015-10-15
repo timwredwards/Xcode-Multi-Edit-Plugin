@@ -3,7 +3,10 @@
 <h3>Overview</h3>
 This is the public repo for the Multi Edit Xcode plugin. This plugin allows developers to quickly and easily edit multiple instances of a selected term in a source document. This is a feature borrowed from many professional text editors, such as Sublime Text.
 
-Example:
+Examples:
+<br>
+<br>
+![](img/one.gif)
 <br>
 <br>
 ![](img/two.gif)
