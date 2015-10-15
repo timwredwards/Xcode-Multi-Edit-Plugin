@@ -24,14 +24,7 @@ static int kMultiEditContextKey;
 
 @implementation xcodeplugin
 
-// future todo:
-// alcatraz
-// settings panel
-// readme
-
 + (void)pluginDidLoad:(NSBundle *)pluginBundle {
-    
-    
     NSString *currentApplicationName = [[NSBundle mainBundle] infoDictionary][@"CFBundleName"];
     
     static dispatch_once_t onceToken;
@@ -85,9 +78,9 @@ static int kMultiEditContextKey;
         [skipNextMenuItem setTarget:self];
         [multiEditSubmenu addItem:skipNextMenuItem];
         
-        NSMenuItem *settingsMenuItem = [[NSMenuItem alloc] initWithTitle:@"Settings" action:@selector(settingsItem) keyEquivalent:@""];
-        [settingsMenuItem setTarget:self];
-        [multiEditSubmenu addItem:settingsMenuItem];
+//        NSMenuItem *settingsMenuItem = [[NSMenuItem alloc] initWithTitle:@"Settings" action:@selector(settingsItem) keyEquivalent:@""];
+//        [settingsMenuItem setTarget:self];
+//        [multiEditSubmenu addItem:settingsMenuItem];
         
         [self setSubmenuKeyEquivalents];
     }
@@ -151,17 +144,11 @@ static int kMultiEditContextKey;
     }
 }
 
--(void)settingsItem{
-    NSWindow *window = [[NSPanel alloc] initWithContentRect:NSRectFromCGRect(CGRectMake(0, 0, 200, 200))
-                                                  styleMask:NSTitledWindowMask
-                                                    backing:NSBackingStoreBuffered
-                                                      defer:NO];
-    [[NSApp mainWindow] beginSheet:window completionHandler:nil];
-    
-    // text field background
-    // text edit background
-    // add next
-    // undo last
-    // skip last
-}
+//-(void)settingsItem{
+//    NSWindow *window = [[NSPanel alloc] initWithContentRect:NSRectFromCGRect(CGRectMake(0, 0, 200, 200))
+//                                                  styleMask:NSTitledWindowMask
+//                                                    backing:NSBackingStoreBuffered
+//                                                      defer:NO];
+//    [[NSApp mainWindow] beginSheet:window completionHandler:nil];
+//}
 @end

@@ -21,8 +21,6 @@
     NSRange selectedRange;
     NSView *containerView;
     NSTextField *textField;
-    
-    MultiEditView *latestViewAdded;
 }
 
 @end
@@ -56,6 +54,7 @@
     }
     
     if (![textField.stringValue isEqualToString:selectedString]) { //started editing text
+        NSBeep();
         return;
     }
     
@@ -121,7 +120,11 @@
 }
 
 -(void)skipNextOccurrence{
-    MultiEditView *viewToSkip = latestViewAdded;
+    MultiEditView *viewToSkip;
+    [self addNextOccurrence];
+    if (editViewsBeforeSelected.count>0) {
+        viewToSkip = editViewsBeforeSelected.lastObject;
+    } else viewToSkip = editViewsAfterSelected.lastObject;
     [self addNextOccurrence];
     [editViewsBeforeSelected removeObject:viewToSkip];
     [editViewsAfterSelected removeObject:viewToSkip];
@@ -133,7 +136,6 @@
     MultiEditView *editView = [[MultiEditView alloc] initWithFrame:rangeRect];
     [editView setPresentedRange:range];
     [mainTextView addSubview:editView];
-    latestViewAdded = editView;
     if ((range.location+range.length)<selectedRange.location) {
         [editViewsBeforeSelected addObject:editView];
     } else {
@@ -148,8 +150,15 @@
     
     containerView = [[NSView alloc] initWithFrame:rangeRect];
     [containerView setWantsLayer:YES];
-    [containerView.layer setBackgroundColor:CGColorCreateGenericGray(1.0, 1.0)];
-    [containerView.layer setBorderColor:CGColorCreateGenericGray(0.0, 1.0)];
+    
+    CGColorRef bgColor = CGColorCreateGenericGray(1.0, 1.0);
+    [containerView.layer setBackgroundColor:bgColor];
+    CGColorRelease(bgColor);
+    
+    CGColorRef borderColor = CGColorCreateGenericGray(0.0, 1.0);
+    [containerView.layer setBorderColor:borderColor];
+    CGColorRelease(borderColor);
+    
     [containerView.layer setBorderWidth:1.0];
     [containerView.layer setCornerRadius:2.0];
     [mainTextView addSubview:containerView];
@@ -162,7 +171,7 @@
     [textField setUsesSingleLineMode:YES];
     
     [textField sizeToFit];
-    CGRect textFrame = CGRectMake(-2, 0, textField.frame.size.width, textField.frame.size.height);
+    CGRect textFrame = CGRectMake(-2, -1, textField.frame.size.width, textField.frame.size.height);
     
     [textField setFrame:NSRectFromCGRect(textFrame)];
     

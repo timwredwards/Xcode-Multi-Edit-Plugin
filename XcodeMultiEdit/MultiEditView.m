@@ -13,8 +13,15 @@
 -(instancetype)initWithFrame:(NSRect)frameRect{
     self = [super initWithFrame:frameRect];
     [self setWantsLayer:YES];
-    [self.layer setBackgroundColor:CGColorCreateGenericGray(0.5, 0.3)];
-    [self.layer setBorderColor:CGColorCreateGenericGray(0.0, 1.0)];
+    
+    CGColorRef bgColor = CGColorCreateGenericGray(0.5, 0.3);
+    [self.layer setBackgroundColor:bgColor];
+    CGColorRelease(bgColor);
+    
+    CGColorRef borderColor = CGColorCreateGenericGray(0.0, 1.0);
+    [self.layer setBorderColor:borderColor];
+    CGColorRelease(borderColor);
+
     [self.layer setBorderWidth:1.0];
     [self.layer setCornerRadius:2.0];
     return self;
