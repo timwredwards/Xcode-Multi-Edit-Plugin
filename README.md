@@ -22,7 +22,7 @@ Then simply type out your replacement text and hit enter.
 
 <h3>Requirements</h3>
 
-Xcode v7.0
+Xcode v7.0<br>
 May work on earlier versions but has not been tested. If you experience problems try updating to the latest version.
 
 <h3>Contributions</h3>
