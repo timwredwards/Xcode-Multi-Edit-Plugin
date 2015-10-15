@@ -53,7 +53,7 @@
         [self setupFirstOccurence];
     }
     
-    if (![textField.stringValue isEqualToString:selectedString]) { //started editing text
+    if (![textField.stringValue isEqualToString:selectedString]) { // if started editing text, no more selecting occurences
         NSBeep();
         return;
     }
@@ -115,14 +115,14 @@
         [editViewsAfterSelected removeLastObject];
     }
     if ((editViewsBeforeSelected.count==0) && (editViewsAfterSelected.count==0)) {
-        [self enterKeyPressed];
+        [self enterKeyPressed]; // no more views to remove
     }
 }
 
 -(void)skipNextOccurrence{
     MultiEditView *viewToSkip;
     [self addNextOccurrence];
-    if (editViewsBeforeSelected.count>0) {
+    if (editViewsBeforeSelected.count>0) { // get last view added
         viewToSkip = editViewsBeforeSelected.lastObject;
     } else viewToSkip = editViewsAfterSelected.lastObject;
     [self addNextOccurrence];
@@ -132,6 +132,7 @@
 }
 
 -(void)createEditViewForStringRange:(NSRange)range{
+    // currently using NSViews but perhaps should be editing the NSAttributedString's background color
     NSRect rangeRect = [[mainTextView layoutManager] boundingRectForGlyphRange:range inTextContainer:mainTextView.textContainer];
     MultiEditView *editView = [[MultiEditView alloc] initWithFrame:rangeRect];
     [editView setPresentedRange:range];
@@ -146,6 +147,7 @@
 
 -(void)createTextFieldViewForStringRange:(NSRange)range{
     
+    // maybe worth subclassing NSTextView
     NSRect rangeRect = [[mainTextView layoutManager] boundingRectForGlyphRange:range inTextContainer:mainTextView.textContainer];
     
     containerView = [[NSView alloc] initWithFrame:rangeRect];
@@ -172,7 +174,6 @@
     
     [textField sizeToFit];
     CGRect textFrame = CGRectMake(-2, -1, textField.frame.size.width, textField.frame.size.height);
-    
     [textField setFrame:NSRectFromCGRect(textFrame)];
     
     [containerView addSubview:textField];
@@ -188,17 +189,14 @@
     
     [textField setStringValue:textField.stringValue];
     if (![textField.stringValue hasSuffix:@" "]) {
-        [textField sizeToFit];
+        [textField sizeToFit]; // sizeToFit screws up with spaces for some reason
     }
     [containerView setFrame:NSRectFromCGRect(CGRectMake(containerView.frame.origin.x,
                                                         containerView.frame.origin.y,
                                                         textField.frame.size.width,
                                                         containerView.frame.size.height))];
     
-    
-    
-    
-    
+    // views for before selected range
     [editViewsBeforeSelected enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         int locationOffset = (int)textField.stringValue.length - (int)selectedString.length;
         locationOffset = locationOffset * (int)idx;
@@ -216,8 +214,8 @@
     [mainTextStorage replaceCharactersInRange:rangeToEdit withString:textField.stringValue withUndoManager:mainDocument.undoManager];
     selectedRange = NSMakeRange(selectedRange.location, textField.stringValue.length);
     
+    // views for after selected range
     [editViewsAfterSelected enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        
         int locationOffset = (int)textField.stringValue.length - (int)selectedString.length;
         locationOffset = locationOffset * ((int)idx+(int)editViewsBeforeSelected.count+1);
         NSRange rangeToEdit = NSMakeRange([obj presentedRange].location+locationOffset, [obj presentedRange].length);
