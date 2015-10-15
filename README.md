@@ -4,8 +4,12 @@
 This is the public repo for the Multi Edit Xcode plugin. This plugin allows developers to quickly and easily edit multiple instances of a selected term in a source document. This is a feature borrowed from many professional text editors, such as Sublime Text.
 
 Examples:
-[]
-[]
+<br>
+<br>
+![alt](img/one.gif)
+<br>
+<br>
+![alt](img/two.gif)
 
 <h3>Installation</h3>
 The plugin can be installed easily through the [Alcatraz Plugin Manager](http://alcatraz.io)
