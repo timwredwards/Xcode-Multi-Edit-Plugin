@@ -227,7 +227,15 @@
     }];
 }
 
+-(void)controlTextDidEndEditing:(NSNotification *)obj {
+    [self stopMultiEdit];
+}
+
 -(void)enterKeyPressed{
+    [self stopMultiEdit];
+}
+
+-(void)stopMultiEdit{
     [editViewsBeforeSelected enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [obj removeFromSuperview];
     }];
