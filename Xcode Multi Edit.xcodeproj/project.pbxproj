@@ -7,11 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1C91B0ED1BCEA3A600A6EBD7 /* MultiEditContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C91B0EC1BCEA3A600A6EBD7 /* MultiEditContext.m */; settings = {ASSET_TAGS = (); }; };
-		1CA36E821BCDFE28009503E6 /* MultiEditView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CA36E811BCDFE28009503E6 /* MultiEditView.m */; settings = {ASSET_TAGS = (); }; };
+		1C91B0ED1BCEA3A600A6EBD7 /* MultiEditContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C91B0EC1BCEA3A600A6EBD7 /* MultiEditContext.m */; };
+		1CA36E821BCDFE28009503E6 /* MultiEditView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CA36E811BCDFE28009503E6 /* MultiEditView.m */; };
 		226268A11AA55B2500ABBBB2 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226268A01AA55B2500ABBBB2 /* AppKit.framework */; };
 		226268A31AA55B2500ABBBB2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226268A21AA55B2500ABBBB2 /* Foundation.framework */; };
-		226268A81AA55B2500ABBBB2 /* XcodeMultiEdit.xcodeproj in Resources */ = {isa = PBXBuildFile; fileRef = 226268A71AA55B2500ABBBB2 /* XcodeMultiEdit.xcodeproj */; };
 		226268AB1AA55B2500ABBBB2 /* MultiEdit.m in Sources */ = {isa = PBXBuildFile; fileRef = 226268AA1AA55B2500ABBBB2 /* MultiEdit.m */; };
 /* End PBXBuildFile section */
 
@@ -26,7 +25,6 @@
 		226268A01AA55B2500ABBBB2 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		226268A21AA55B2500ABBBB2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		226268A61AA55B2500ABBBB2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		226268A71AA55B2500ABBBB2 /* XcodeMultiEdit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = XcodeMultiEdit.xcodeproj; sourceTree = SOURCE_ROOT; };
 		226268AA1AA55B2500ABBBB2 /* MultiEdit.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MultiEdit.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -43,11 +41,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1C73A9731BCCB66A00BC198E /* Products */ = {
-			isa = PBXGroup;
-			name = Products;
-			sourceTree = "<group>";
-		};
 		226268941AA55B2500ABBBB2 = {
 			isa = PBXGroup;
 			children = (
@@ -94,7 +87,6 @@
 			isa = PBXGroup;
 			children = (
 				226268A61AA55B2500ABBBB2 /* Info.plist */,
-				226268A71AA55B2500ABBBB2 /* XcodeMultiEdit.xcodeproj */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -133,7 +125,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 226268981AA55B2500ABBBB2 /* Build configuration list for PBXProject "XcodeMultiEdit" */;
+			buildConfigurationList = 226268981AA55B2500ABBBB2 /* Build configuration list for PBXProject "Xcode Multi Edit" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -143,12 +135,6 @@
 			mainGroup = 226268941AA55B2500ABBBB2;
 			productRefGroup = 2262689E1AA55B2500ABBBB2 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 1C73A9731BCCB66A00BC198E /* Products */;
-					ProjectRef = 226268A71AA55B2500ABBBB2 /* XcodeMultiEdit.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				2262689C1AA55B2500ABBBB2 /* XcodeMultiEdit */,
@@ -161,7 +147,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				226268A81AA55B2500ABBBB2 /* XcodeMultiEdit.xcodeproj in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -286,7 +271,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		226268981AA55B2500ABBBB2 /* Build configuration list for PBXProject "XcodeMultiEdit" */ = {
+		226268981AA55B2500ABBBB2 /* Build configuration list for PBXProject "Xcode Multi Edit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				226268AC1AA55B2500ABBBB2 /* Debug */,
