@@ -89,13 +89,13 @@ static int kMultiEditContextKey;
 }
 
 -(void)setSubmenuKeyEquivalents{
-    [[multiEditSubmenu itemAtIndex:0] setKeyEquivalent:@"d"];
+    [[multiEditSubmenu itemAtIndex:0] setKeyEquivalent:@"a"];
     [[multiEditSubmenu itemAtIndex:0] setKeyEquivalentModifierMask:NSShiftKeyMask | NSAlternateKeyMask];
     
-    [[multiEditSubmenu itemAtIndex:1] setKeyEquivalent:@"u"];
+    [[multiEditSubmenu itemAtIndex:1] setKeyEquivalent:@"z"];
     [[multiEditSubmenu itemAtIndex:1] setKeyEquivalentModifierMask:NSShiftKeyMask | NSAlternateKeyMask];
     
-    [[multiEditSubmenu itemAtIndex:2] setKeyEquivalent:@"k"];
+    [[multiEditSubmenu itemAtIndex:2] setKeyEquivalent:@"s"];
     [[multiEditSubmenu itemAtIndex:2] setKeyEquivalentModifierMask:NSShiftKeyMask | NSAlternateKeyMask];
 }
 
