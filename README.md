@@ -1,3 +1,5 @@
+<h3>NOTE: Since Apple removed plugin injection in Xcode 8, this plugin is no longer functional, or possible.</h3>
+
 # Xcode-Multi-Edit-Plugin
 
 <h3>Overview</h3>
